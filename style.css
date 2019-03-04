@@ -24,7 +24,6 @@ h1 {
   background-color: silver;
   box-shadow:0 1px 1px 1px rgba(0,0,0,0.5);
   border-radius: 4px;
-    /* background: linear-gradient(to right, rgba(207,231,250,1) 0%,rgba(99,147,193,1) 100%); */
 
 }
 
@@ -39,17 +38,26 @@ h1 {
   position: relative;
   width: 96%;
   height: 84%;
-  background-color: navy;
   top: 8%;
   left: 2%;
   text-align: right;
-  font-size: 5rem;
   border-radius: 2px;
   color: 	#F0FFFF;
   background-color: #bccd95;
   border: 2px solid #428bca;
-  color: black;
   box-shadow: inset 0 0 3px #000000;
+}
+.display-window > p {
+  color: black;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  word-wrap: break-word;
+  font-size: 4.6rem;
+}
+
+.display-window > .newLine::first-line{
+  font-size: 3rem;
 }
 
 .buttons-container {
@@ -61,22 +69,18 @@ h1 {
 }
 
 
-.buttons-container {
-  /* background: linear-gradient(to right, rgba(207,231,250,1) 0%,rgba(99,147,193,1) 100%); */
-}
 
 .buttons-container button {
   height: 100%;
   border: 1px solid silver;
   border-radius: 0;
-  /* opacity: 0.5; */
-  /* box-shadow: inset 0px 1px 0px rgba(255,255,255,.3), inset 0px 0px 3px rgba(255,255,255,.5); */
+  font-size: 3rem;
 }
 
 .numbers-and-clear .row, .operators>.row{
   height: 20%;
 }
-.number, .clear, .operator-div, .decimal-div{
+.number, .clear, .clear-entry, .operator-div, .decimal-div{
   height: 100%;
   padding: 0;
 }

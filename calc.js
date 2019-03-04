@@ -13,34 +13,39 @@ function startApp() {
 function clickHandlers() {
   $('.number button').on('click', numberInputed)
   $('button.operator').on('click', operatorInputed);
-  $('.clear>button').on('click', clearResult);
+  $('.clear>button').on('click', clearEverything);
+  $('.clear-entry>button').on('click', clearEntry)
   $('#decimal').on('click', inputDecimal);
+  $('button').on('click', fitToScreen)
 }
+
+//FUNCTIONS FOR BUTTONS CLICKED:
 
 
 function numberInputed() {
   if(isNaN(inputArray[inputArray.length-1]) && inputArray[inputArray.length-1] !== '.') {
     inputArray.push($(this).text());
-    console.log('inputArray:', inputArray);
-    $('.display-window').text($(this).text());
+    $('.display-window > p').append($(this).text());
+
   } else {
       inputArray[inputArray.length-1] += $(this).text();
-      $('.display-window').append($(this).text());
+      $('.display-window > p').append($(this).text());
   }
-  console.log('inputArray:', inputArray);
-  previousNum = $(this).text();
+  previousNum = inputArray[inputArray.length-1];
 }
 
 
 function operatorInputed() {
-  determineResult();
+  determineResult($(this));
 
   if($(this).text() === '=') { //if the operator is an equal sign
+    $('.display-window > p').removeClass('newLine')
     checkForRepeatOrRollover($(this));
     equalsCheck = true;
-    checkForInfinity();
-    checkForMissingOperands();
     missingOperationCheck()
+    $('.display-window > p').text(Math.round( 100000000 * inputArray[0]) / 100000000);
+    checkForMissingOperands();
+    checkForInfinity();
 
   } else { //this covers the other operators
       testForMultipleOperations();
@@ -48,15 +53,12 @@ function operatorInputed() {
       checkForRepeatOrRollover($(this));
       lastOperatorClicked = $(this).text();
       equalsCheck = false;
-      $('.display-window').text(inputArray[0]);
+      $('.display-window > p').append($(this).text());
       prematureOperationCheck();
   }
-
-  console.log('inputArray:', inputArray)
-  console.log('previousnum:', previousNum);
-  console.log('lastoperator:', lastOperatorClicked);
 }
 
+//MATH FUNCTIONS:
 
 function doMath(num1, num2, operator) {
   num1 = parseFloat(num1);
@@ -76,79 +78,94 @@ function doMath(num1, num2, operator) {
       result = num1 / num2;
       break;
   }
-
   return result;
+}
+
+
+function determineResult(operator) {
+  var result = null;
+  if(inputArray.length >= 3 ) {
+
+    for(var input=0; input<inputArray.length-1; input++) {
+      if(inputArray[input] === 'x' || inputArray[input] === '/') {
+        result = doMath(inputArray[input-1],inputArray[input+1], inputArray[input]);
+        inputArray.splice(input-1, 3, result);
+        input = 0;
+      }
+    }
+  }
+  if(inputArray.length >= 5) {
+    result = doMath(inputArray[0],inputArray[2], inputArray[1]);
+    inputArray.splice(0,3,result)
+  }
+
+
+  if(inputArray.length === 3 && operator.text() === '=') {
+    for(var input=0; input<inputArray.length-1; input++) {
+      if(isNaN(inputArray[input])) {
+        result = doMath(inputArray[input-1],inputArray[input+1], inputArray[input]);
+        inputArray.splice(input-1, 3, result);
+        input = 0;
+      }
+    }
+  }
+}
+
+//COMPREHENSIVE/ADVANCED OPERATION CHECKS:
+
+
+function checkForRepeatOrRollover(operator) {
+
+   if(equalsCheck === true && operator.text() === '=' && lastOperatorClicked !== null) { //checks if previous input is an equal sign
+     inputArray = [doMath(inputArray[0], previousNum, lastOperatorClicked)];
+
+   } else if(operator.text() === '=') { //checks if previous input is an operator
+
+     if(inputArray.length === 2) {
+        previousNum = inputArray[0]; //if this operation is followed by another equal sign, set previousNum to sum of previous digits
+        inputArray = [doMath(inputArray[0], inputArray[0], lastOperatorClicked)];
+
+     } else if(inputArray.length === 4 && inputArray[1] !== inputArray[3]){
+       previousNum === inputArray[2]
+       var secondNum = doMath(inputArray[2], inputArray[2], lastOperatorClicked);
+       inputArray = [doMath(inputArray[0],secondNum, inputArray[1])]
+
+     } else if(inputArray.length === 4 && inputArray[1] === inputArray[3]) {
+       previousNum = doMath(inputArray[0],inputArray[2],lastOperatorClicked)
+       inputArray = [doMath(previousNum, previousNum, lastOperatorClicked)]
+     }
+  }
 }
 
 
 function inputDecimal() {
   var lastIndex = inputArray.length-1;
   if(inputArray.length >= 1 && inputArray[lastIndex].indexOf('.') > -1  ) {
-    // return inputArray;
+    return true;
   } else if(isNaN(inputArray[lastIndex])) {
     inputArray.push($(this).text());
-    $('.display-window').text('.')
+    $('.display-window > p').append($(this).text());
   } else {
     inputArray[lastIndex] += '.';
-    $('.display-window').append($(this).text());
+    $('.display-window > p').append($(this).text());
   }
 
-  console.log(inputArray);
 }
 
 
 function testForMultipleOperations() {
   if(isNaN(inputArray[inputArray.length-1])) {
     inputArray.pop();
+    $('.display-window > p').text($('.display-window > p').text().slice(0,-1))
   }
 }
 
-
-function clearResult() {
-  inputArray = [];
-  result = 0;
-  console.log(inputArray);
-  $('.display-window').text('');
-  previousNum = null;
-  lastOperatorClicked = null;
-}
-
-
-function determineResult() {
-  if(inputArray.length === 3) {
-
-    var result = doMath(inputArray[0],inputArray[2],inputArray[1]);
-    console.log('result:', result);
-    inputArray = [result];
-  }
-}
-
-
-function getPreviousResults() {
-   lastOperatorClicked = inputArray[inputArray.length-1];
-   previousNum = inputArray[0];
-}
-
-
-function checkForRepeatOrRollover(operator) {
-
-   if(equalsCheck === true && operator.text() === '=' && lastOperatorClicked !== null) { //checks if previous input is ==
-
-     inputArray = [doMath(inputArray[0], previousNum, lastOperatorClicked)];
-
-   } else if(operator.text() === '=' && inputArray.length === 2) { //checks if previous input is an operator
-     console.log(inputArray.length)
-     previousNum = inputArray[0]; //if this operation is followed by another equal sign, set previousNum to sum of previous digits
-    inputArray = [doMath(inputArray[0], inputArray[0], lastOperatorClicked)];
-  }
-}
 
 
 function checkForInfinity() {
   if(inputArray[0] === Infinity) {
-    $('.display-window').text("Error")
-  } else {
-    $('.display-window').text(inputArray[0]);
+    $('.display-window > p').text("Error");
+    inputArray.pop();
   }
 }
 
@@ -156,14 +173,15 @@ function checkForInfinity() {
 function prematureOperationCheck() {
   if(inputArray.length === 1) {
     inputArray.pop();
+    $('.display-window > p').text(' ');
   }
 }
 
 
 function checkForMissingOperands() {
   if(inputArray.length === 0 || inputArray[0] === null) {
-    $('.display-window').text('Ready');
     inputArray.pop();
+    $('.display-window > p').text(0);
   }
 }
 
@@ -171,5 +189,33 @@ function checkForMissingOperands() {
 function missingOperationCheck() {
   if(inputArray.length === 1 && lastOperatorClicked === null && previousNum === null) {
     inputArray = [inputArray[0]];
+  }
+}
+
+
+//CLEAR BUTTONS
+
+function clearEverything() {
+  $('.display-window > p').removeClass('newLine')
+  inputArray = [];
+  $('.display-window > p').text('');
+  previousNum = null;
+  lastOperatorClicked = null;
+}
+
+function clearEntry() {
+  if(inputArray.length % 2 !== 0) {
+    var displayText = $('.display-window > p').text();
+    var lastNumber = inputArray[inputArray.length-1]
+    $('.display-window > p').text(displayText.substring(0, displayText.length - lastNumber.length));
+    inputArray.pop(lastNumber);
+  }
+}
+
+//FIXES PROBLEM OF LARGE AMOUNT OF DIGITS INPUTED:
+
+function fitToScreen() {
+  if($('.display-window > p').height() > 65) {
+    $('.display-window > p').addClass('newLine')
   }
 }
