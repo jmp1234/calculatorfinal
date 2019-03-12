@@ -153,7 +153,7 @@ function inputDecimal() {
 }
 
 
-function testForMultipleOperations() {
+function testForMultipleOperations() { //if there are multiple successive operations, the last one is chosen as the input value
   if(isNaN(inputArray[inputArray.length-1])) {
     inputArray.pop();
     $('.display-window > p').text($('.display-window > p').text().slice(0,-1))
@@ -162,7 +162,7 @@ function testForMultipleOperations() {
 
 
 
-function checkForInfinity() {
+function checkForInfinity() { //changes an infinity value to error
   if(inputArray[0] === Infinity) {
     $('.display-window > p').text("Error");
     inputArray.pop();
@@ -170,7 +170,7 @@ function checkForInfinity() {
 }
 
 
-function prematureOperationCheck() {
+function prematureOperationCheck() {  //ignores all operators that are placed before the start of a number
   if(inputArray.length === 1) {
     inputArray.pop();
     $('.display-window > p').text(' ');
@@ -178,7 +178,7 @@ function prematureOperationCheck() {
 }
 
 
-function checkForMissingOperands() {
+function checkForMissingOperands() { // if multiple equal signs (e.g. ===) are placed before anything is inputed, 0 is displayed on the screen
   if(inputArray.length === 0 || inputArray[0] === null) {
     inputArray.pop();
     $('.display-window > p').text(0);
@@ -186,7 +186,7 @@ function checkForMissingOperands() {
 }
 
 
-function missingOperationCheck() {
+function missingOperationCheck()  //if an equal sign is entered without entering an operator, the original number is displayed
   if(inputArray.length === 1 && lastOperatorClicked === null && previousNum === null) {
     inputArray = [inputArray[0]];
   }
@@ -195,7 +195,7 @@ function missingOperationCheck() {
 
 //CLEAR BUTTONS
 
-function clearEverything() {
+function clearEverything() {   //clears everything
   $('.display-window > p').removeClass('newLine')
   inputArray = [];
   $('.display-window > p').text('');
@@ -203,7 +203,7 @@ function clearEverything() {
   lastOperatorClicked = null;
 }
 
-function clearEntry() {
+function clearEntry() {  //clears the most recent number
   if(inputArray.length % 2 !== 0) {
     var displayText = $('.display-window > p').text();
     var lastNumber = inputArray[inputArray.length-1]
