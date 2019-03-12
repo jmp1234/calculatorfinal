@@ -10,7 +10,7 @@ function startApp() {
 }
 
 
-function clickHandlers() {
+function clickHandlers() { //these functions are called based on what buttons are pressed
   $('.number button').on('click', numberInputed)
   $('button.operator').on('click', operatorInputed);
   $('.clear>button').on('click', clearEverything);
@@ -36,16 +36,16 @@ function numberInputed() {
 
 
 function operatorInputed() {
-  determineResult($(this));
+  determineResult($(this)); //when an operator is inputed, the current values in the input array are calculated
 
   if($(this).text() === '=') { //if the operator is an equal sign
     $('.display-window > p').removeClass('newLine')
     checkForRepeatOrRollover($(this));
     equalsCheck = true;
-    missingOperationCheck()
+    missingOperationCheck() //checks for missing operations
     $('.display-window > p').text(Math.round( 100000000 * inputArray[0]) / 100000000);
     checkForMissingOperands();
-    checkForInfinity();
+    checkForInfinity(); //changes value of infinity to error
 
   } else { //this covers the other operators
       testForMultipleOperations();
@@ -82,9 +82,9 @@ function doMath(num1, num2, operator) {
 }
 
 
-function determineResult(operator) {
+function determineResult(operator) { //determines the solution of the numbers/operators in the input array based on order of operations.
   var result = null;
-  if(inputArray.length >= 3 ) {
+  if(inputArray.length >= 3 ) { //if the numbers in the array are multiplied or divided, the solution in the input array is calcualted
 
     for(var input=0; input<inputArray.length-1; input++) {
       if(inputArray[input] === 'x' || inputArray[input] === '/') {
@@ -100,7 +100,7 @@ function determineResult(operator) {
   }
 
 
-  if(inputArray.length === 3 && operator.text() === '=') {
+  if(inputArray.length === 3 && operator.text() === '=') { //computes the solution right away, since an equal sign was clicked
     for(var input=0; input<inputArray.length-1; input++) {
       if(isNaN(inputArray[input])) {
         result = doMath(inputArray[input-1],inputArray[input+1], inputArray[input]);
@@ -114,7 +114,7 @@ function determineResult(operator) {
 //COMPREHENSIVE/ADVANCED OPERATION CHECKS:
 
 
-function checkForRepeatOrRollover(operator) {
+function checkForRepeatOrRollover(operator) { //given an input of '==' or an equal sign following an operator, math is done on the current input array
 
    if(equalsCheck === true && operator.text() === '=' && lastOperatorClicked !== null) { //checks if previous input is an equal sign
      inputArray = [doMath(inputArray[0], previousNum, lastOperatorClicked)];
